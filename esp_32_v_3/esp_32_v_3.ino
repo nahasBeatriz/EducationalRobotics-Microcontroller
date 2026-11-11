@@ -153,13 +153,21 @@ void handleSequence() {
 // ── setup / loop ───────────────────────────────────────
 void setup() {
   Serial.begin(115200);
+
+  // ── Garante pinos dos motores em LOW antes de qualquer delay ──
+  int motorPins[] = {IN1, IN2, IN3, IN4};
+  for (int i = 0; i < 4; i++) {
+    pinMode(motorPins[i], OUTPUT);
+    digitalWrite(motorPins[i], LOW);
+  }
+
   delay(1000);
 
-  // Motor — API core 2.x: canal + pino separados
-  int motorPins[] = {IN1, IN2, IN3, IN4};
+  // Motor — LEDC core 2.x
   for (int i = 0; i < 4; i++) {
     ledcSetup(i, PWM_FREQ, PWM_RESOLUTION);
     ledcAttachPin(motorPins[i], i);
+    ledcWrite(i, 0);          // força duty 0 logo após attach
   }
   motorStop();
 
